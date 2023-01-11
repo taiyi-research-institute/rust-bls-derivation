@@ -98,9 +98,7 @@ pub fn derive_child_sk(parent_sk: FE, path_str: &str) -> FE {
 }
 
 // private->private non-hardened child key derivation
-pub fn ckd_sk_normal<
-    T: BLSCurve + curv::elliptic::curves::ECPoint<Scalar = FieldScalar>,
->(
+pub fn ckd_sk_normal<T: BLSCurve + curv::elliptic::curves::ECPoint<Scalar = FieldScalar>>(
     parent_sk: &FE,
     index: u32,
 ) -> FE {
@@ -124,9 +122,7 @@ pub fn derive_child_sk_normal<
 }
 
 // public->public non-hardened child key derivation
-pub fn ckd_pk_normal<
-    T: BLSCurve + curv::elliptic::curves::ECPoint<Scalar = FieldScalar> + Copy,
->(
+pub fn ckd_pk_normal<T: BLSCurve + curv::elliptic::curves::ECPoint<Scalar = FieldScalar> + Copy>(
     parent_pk: &T,
     index: u32,
 ) -> T {
@@ -150,9 +146,7 @@ pub fn derive_child_pk_normal<
 }
 
 // Compute the scalar tweak added to this key to get a child key
-pub fn ckd_tweak_normal<
-    T: BLSCurve + curv::elliptic::curves::ECPoint<Scalar = FieldScalar>,
->(
+pub fn ckd_tweak_normal<T: BLSCurve + curv::elliptic::curves::ECPoint<Scalar = FieldScalar>>(
     parent_pk: &T,
     index: u32,
 ) -> FE {
@@ -233,11 +227,12 @@ mod test {
             let master_sk: FE =
                 ECScalar::from_bigint(&BigInt::from_str_radix(t.master_sk, 10).unwrap());
             let child_index = u32::from_str_radix(t.child_index, 10).unwrap();
-            let child_sk: FE = ECScalar::from_bigint(&BigInt::from_str_radix(t.child_sk, 10).unwrap());
-    
+            let child_sk: FE =
+                ECScalar::from_bigint(&BigInt::from_str_radix(t.child_sk, 10).unwrap());
+
             let derived_master_sk: FE = derive_master_sk(seed.as_ref()).unwrap();
             assert_eq!(derived_master_sk, master_sk);
-    
+
             let derived_sk: FE = ckd_sk_hardened(&master_sk, child_index);
             assert_eq!(derived_sk, child_sk);
         }
@@ -255,8 +250,8 @@ mod test {
 
         // test non-hardened child key derivation
         let seed: [u8; 37] = [
-            1, 50, 6, 244, 24, 199, 1, 25, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            1, 50, 6, 244, 24, 199, 1, 25, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
         ];
         let derived_master_sk: FE = derive_master_sk(&seed).unwrap();
         let derived_master_pk: GE2 = ECPoint::generator_mul(&derived_master_sk);
@@ -270,14 +265,21 @@ mod test {
             derived_grandchild_pk,
             ECPoint::generator_mul(&derived_grandchild_sk),
         );
-        let derived_greatgrandchild_sk: FE = ckd_sk_normal::<GE2>(&derived_grandchild_sk, 3141592653u32);
+        let derived_greatgrandchild_sk: FE =
+            ckd_sk_normal::<GE2>(&derived_grandchild_sk, 3141592653u32);
         let derived_greatgrandchild_pk: GE2 = ckd_pk_normal(&derived_grandchild_pk, 3141592653u32);
         assert_eq!(
             derived_greatgrandchild_pk,
             ECPoint::generator_mul(&derived_greatgrandchild_sk),
         );
-    
-        assert_eq!(derive_child_sk_normal::<GE2>(derived_master_sk, "m/42/12142/3141592653"), derived_greatgrandchild_sk);
-        assert_eq!(derive_child_pk_normal(derived_master_pk, "m/42/12142/3141592653"), derived_greatgrandchild_pk);
+
+        assert_eq!(
+            derive_child_sk_normal::<GE2>(derived_master_sk, "m/42/12142/3141592653"),
+            derived_greatgrandchild_sk
+        );
+        assert_eq!(
+            derive_child_pk_normal(derived_master_pk, "m/42/12142/3141592653"),
+            derived_greatgrandchild_pk
+        );
     }
 }
