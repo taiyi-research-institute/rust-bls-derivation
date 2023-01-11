@@ -1,22 +1,22 @@
-# Rust BLS key derivation (EIP2333, EIP2334)
+# Rust BLS child key derivation (EIP2333, EIP2334)
 
-This library contains a straightforward interface to BLS12-381 key derivation in complete compliance with [EIP2333](https://eips.ethereum.org/EIPS/eip-2333).
+This library is a forked version of [bls_key_derivation](https://crates.io/crates/bls_key_derivation), containing a straightforward interface to BLS12-381 child key derivation in complete compliance with [EIP2333](https://eips.ethereum.org/EIPS/eip-2333).
 
-Since EIP2333 only proposes the hardened key derivation, this library has also implemented a method of non-hardened key derivation inspired by [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) to support the current application scenarios.
+Since EIP2333 only proposes the hardened child key derivation, this library has also implemented a method of non-hardened child key derivation inspired by [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) to support the current application scenarios.
 
 ## Changes
 
 Differences with the original library (<https://github.com/ChainSafe/rust-bls-derivation>) lie in the following:
 
 1. removing the dependency on the unmaintained-for-over-6-years crate [rust-crypto](https://crates.io/crates/rust-crypto);
-2. adding the active crate [curv-kzen](https://crates.io/crates/curv-kzen) to support non-hardened BLS key derivation beyond EIP233;
+2. adding the active crate [curv-kzen](https://crates.io/crates/curv-kzen) to support non-hardened BLS child key derivation beyond EIP2333;
 3. changing the lower limit of the seed entropy from 16 bytes to 32 bytes to be consistent with the current EIP2333 and [draft-irtf-cfrg-bls-signature-05](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-05);
 4. particularly modifying the function `hkdf_mod_r` in the following 5 parts to be in complete compliance with both EIP2333 and KeyGen in [Section 2.3 of draft-irtf-cfrg-bls-signature-05](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-05#name-keygen):
-   (1) IKM -> IMK || I20SP(0, 1);
-   (2) keyinfo -> keyinfo || I20SP(L, 2);
-   (3) salt -> H(salt);
-   (4) add a loop with the zero private key check;
-   (5) add an input parameter `key_info` to support user-customized key info strings instead of fixing as a default empty string "".
+   1. IKM -> IMK || I20SP(0, 1);
+   2. keyinfo -> keyinfo || I20SP(L, 2);
+   3. salt -> H(salt);
+   4. add a loop with the zero private key check;
+   5. add an input parameter `key_info` to support user-customized key info strings instead of fixing as a default empty string "".
 
 ## Usage
 
